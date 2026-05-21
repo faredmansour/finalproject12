@@ -1,0 +1,40 @@
+
+const User = require("../models/User");
+const { hashPassword } = require("../utils/password");
+
+const register = async (req, res) => {
+  try {
+    const { name, email, password, school, grade, governorate } = req.body;
+
+    const existingUser = await User.findOne({ email });
+
+    if (existingUser) {
+      return res.status(400).json({
+        message: "Email already exists",
+      });
+    }
+
+const hashedPassword = await hashPassword(password);
+
+
+    const user = await User.create({
+      name,
+      email,
+      password: hashedPassword,
+      school,
+      grade,
+      governorate,
+    });
+
+    res.status(201).json({
+      message: "User created successfully",
+      user,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+
+module.exports = {register,};
